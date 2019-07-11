@@ -1,0 +1,4 @@
+<launch>
+  <test test-name="test_tensorflow_ros" pkg="tensorflow_ros" type="test_tensorflow_ros" name="test_tensorflow_ros"/>
+  <param name ="test_model_file" value="$(find tensorflow_ros)/test/model/test_model.pb"/>
+</launch>

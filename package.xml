@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>tensorflow_ros</name>
+  <version>1.10.0</version>
+  <description>TensorFlow interface package</description>
+  <maintainer email="david.wong@tier4.jp">David Wong</maintainer>
+  <license>Apache 2</license>
+  <author email="david.wong@tier4.jp">David Wong</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rostest</build_depend>
+  <build_depend>gtest</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <test_depend>roslaunch</test_depend>
+  <test_depend>rosunit</test_depend>
+
+  <export>
+  </export>
+</package>
