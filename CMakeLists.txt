@@ -11,10 +11,10 @@ include(cmake/cudnn.cmake)
 include(cmake/tensorflow.cmake)
 
 if(TENSORFLOW_FOUND AND CUDA_FOUND AND CUDNN_FOUND AND ((${CUDA_VERSION} STREQUAL "9.0") OR (${CUDA_VERSION} STREQUAL "10.0")))
-    message("-- USING TENSORFLOW IN GPU MODE --")
-    message("CUDA Version: " ${CUDA_VERSION})
-    message("CUDA Library: " ${CUDA_CUDA_LIBRARY})
-    message("CUDA Runtime: " ${CUDA_CUDART_LIBRARY})
+    message(STATUS "-- USING TENSORFLOW IN GPU MODE --")
+    message(STATUS "CUDA Version: " ${CUDA_VERSION})
+    message(STATUS "CUDA Library: " ${CUDA_CUDA_LIBRARY})
+    message(STATUS "CUDA Runtime: " ${CUDA_CUDART_LIBRARY})
 
   catkin_package(
     INCLUDE_DIRS include
@@ -26,7 +26,7 @@ if(TENSORFLOW_FOUND AND CUDA_FOUND AND CUDNN_FOUND AND ((${CUDA_VERSION} STREQUA
       roscpp
     )
 elseif(TENSORFLOW_FOUND)
-  message("-- USING TENSORFLOW IN CPU MODE --")
+  message(STATUS "-- USING TENSORFLOW IN CPU MODE --")
   catkin_package(
     INCLUDE_DIRS include
     LIBRARIES tensorflow_ros
