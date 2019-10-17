@@ -8,17 +8,21 @@ This ROS package provides a simple interface to the TensorFlow C API.
 * NVIDIA GPU with compute capability of 6.0 or higher.
 * CUDA: Tested with v9.0 and v10.0 -> [How to install](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)
 * CUDNN: Tested with 7.4.1 -> [How to install](https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html)
-* TensorFlow C API (GPU version): Tested with 1.12.1 and 1.13.1 -> [How to install](https://www.tensorflow.org/install/lang_c)
+* (Optional) TensorFlow C API (GPU version): Tested with 1.12.0 and 1.14.0 -> [How to install](https://www.tensorflow.org/install/lang_c)
+
+If you do not install the TensorFlow C API manually, the appropriate version of the library for your CUDA version will automatically be downloaded and installed into the project install space.
 
 #### For CPU only:
-* TensorFlow C API (CPU version): Tested with 1.12.1 -> [How to install](https://www.tensorflow.org/install/lang_c)
+* (Optional) TensorFlow C API (CPU version): Tested with 1.12.1 -> [How to install](https://www.tensorflow.org/install/lang_c)
+
+If you do not install the TensorFlow C API manually, and you do not have compatible CUDA/CUDNN, the CPU version of the library automatically be downloaded and installed into the project install space.
 
 ## How to setup
 
 #### For GPU support:
 1. Install CUDA
 2. Install CUDNN
-3. Install TensorFlow C API (GPU version)
+3. (Optional) Install TensorFlow C API (GPU version)
 4. Build:
 ```
 $ colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
@@ -29,7 +33,7 @@ $ colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-up-to tensorfl
 ```
 
 #### For CPU only:
-1. Install TensorFlow C API (CPU version)
+1. (Optional) Install TensorFlow C API (CPU version)
 2. Build:
 ```
 $ colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
