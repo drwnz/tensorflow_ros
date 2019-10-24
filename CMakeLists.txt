@@ -10,22 +10,27 @@ find_package(catkin REQUIRED COMPONENTS
 include(cmake/cudnn.cmake)
 include(cmake/tensorflow.cmake)
 
-if(TENSORFLOW_FOUND AND CUDA_FOUND AND CUDNN_FOUND AND ((${CUDA_VERSION} STREQUAL "9.0") OR (${CUDA_VERSION} STREQUAL "10.0")))
+if(TENSORFLOW_FOUND AND CUDA_FOUND AND CUDNN_FOUND)
+  if((${CUDA_VERSION} STREQUAL "9.0") OR (${CUDA_VERSION} STREQUAL "10.0"))
     message(STATUS "-- USING TENSORFLOW IN GPU MODE --")
     message(STATUS "CUDA Version: " ${CUDA_VERSION})
     message(STATUS "CUDA Library: " ${CUDA_CUDA_LIBRARY})
     message(STATUS "CUDA Runtime: " ${CUDA_CUDART_LIBRARY})
-
-  catkin_package(
-    INCLUDE_DIRS include
-    LIBRARIES tensorflow_ros
-    DEPENDS
-      TENSORFLOW
-      CUDA
-      CUDNN
-      roscpp
-    )
-elseif(TENSORFLOW_FOUND)
+    set(TENSORFLOW_CPU FALSE)
+    catkin_package(
+      INCLUDE_DIRS include
+      LIBRARIES tensorflow_ros
+      DEPENDS
+        TENSORFLOW
+        CUDA
+        CUDNN
+        roscpp
+      )
+  else()
+    message(WARNING "The installed CUDA version " ${CUDA_VERSION} "is not compatible with TensorFlow")
+  endif()
+endif()
+if(TENSORFLOW_FOUND AND ${TENSORFLOW_CPU})
   message(STATUS "-- USING TENSORFLOW IN CPU MODE --")
   catkin_package(
     INCLUDE_DIRS include

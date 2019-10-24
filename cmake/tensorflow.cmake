@@ -14,21 +14,30 @@ find_library(TENSORFLOW_LIBRARY
 find_package_handle_standard_args(TENSORFLOW DEFAULT_MSG TENSORFLOW_INCLUDE_DIR TENSORFLOW_LIBRARY)
 find_package(CUDA)
 
+set(TENSORFLOW_CPU TRUE)
+
 if(NOT TENSORFLOW_FOUND)
   make_directory(${CMAKE_INSTALL_PREFIX}/tensorflow)
-  if(CUDA_FOUND AND CUDNN_FOUND AND (${CUDA_VERSION} STREQUAL "9.0"))
-    message(STATUS "Downloading GPU version of TensorFlow for CUDA 9.0")
-    file(DOWNLOAD https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-gpu-linux-x86_64-1.12.0.tar.gz
-      ${CMAKE_INSTALL_PREFIX}/tensorflow/tensorflow.tar.gz
-      STATUS status
-      )
-  elseif(CUDA_FOUND AND CUDNN_FOUND AND (${CUDA_VERSION} STREQUAL "10.0"))
-    message(STATUS "Downloading GPU version of TensorFlow for CUDA 10.0")
-    file(DOWNLOAD https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-gpu-linux-x86_64-1.14.0.tar.gz
-      ${CMAKE_INSTALL_PREFIX}/tensorflow/tensorflow.tar.gz
-      STATUS status
-      )
-  else()
+  if(CUDA_FOUND AND CUDNN_FOUND)
+    if(${CUDA_VERSION} STREQUAL "9.0")
+      message(STATUS "Downloading GPU version of TensorFlow for CUDA 9.0")
+      file(DOWNLOAD https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-gpu-linux-x86_64-1.12.0.tar.gz
+        ${CMAKE_INSTALL_PREFIX}/tensorflow/tensorflow.tar.gz
+        STATUS status
+        )
+      set(TENSORFLOW_CPU FALSE)
+    elseif(${CUDA_VERSION} STREQUAL "10.0")
+      message(STATUS "Downloading GPU version of TensorFlow for CUDA 10.0")
+      file(DOWNLOAD https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-gpu-linux-x86_64-1.14.0.tar.gz
+        ${CMAKE_INSTALL_PREFIX}/tensorflow/tensorflow.tar.gz
+        STATUS status
+        )
+      set(TENSORFLOW_CPU FALSE)
+    else()
+      message(WARNING "The installed CUDA version " ${CUDA_VERSION} "is not compatible with TensorFlow")
+    endif()
+  endif()
+  if(${TENSORFLOW_CPU})
     message(STATUS "Downloading CPU version of TensorFlow")
     file(DOWNLOAD https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.14.0.tar.gz
       ${CMAKE_INSTALL_PREFIX}/tensorflow/tensorflow.tar.gz
