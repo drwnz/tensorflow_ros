@@ -1,7 +1,7 @@
-<?xml version="1.0"?>
+<?xml version="0.1.0"?>
 <package>
   <name>tensorflow_ros</name>
-  <version>1.10.0</version>
+  <version>0.1.0</version>
   <description>TensorFlow interface package</description>
   <maintainer email="david.wong@tier4.jp">David Wong</maintainer>
   <license>Apache 2</license>

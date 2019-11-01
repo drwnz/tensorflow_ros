@@ -2,15 +2,12 @@ stages:
   - build
   - deploy
 
-variables:
-  AUTOWARE_CROSS_TARGET_PLATFORM: generic-aarch64
-
 .build: &build_common
   before_script:
     - mkdir -p src_tmp/$CI_PROJECT_NAME && mv `find -maxdepth 1 -not -name . -not -name src_tmp` src_tmp/$CI_PROJECT_NAME && mv src_tmp/ src/
-    - sudo apt-get update
-    - sudo apt-get install -y libarmadillo-dev libglew-dev libssh2-1-dev python-flask python-requests wget
-    - sudo apt-get install -y python3-pip python3-setuptools python3-colcon-common-extensions python3-vcstool
+    - apt-get update
+    - apt-get install -y libarmadillo-dev libglew-dev libssh2-1-dev python-flask python-requests wget
+    - apt-get install -y python3-pip python3-setuptools python3-colcon-common-extensions
     # Update setuptools from PyPI because the version Ubuntu ships with is too old
     - pip3 install -U setuptools
     # Install lcov from the Ubuntu package. We need 1.13 at least.
@@ -51,12 +48,28 @@ variables:
     - merge_requests
     - master
 
-.build_cuda: &build_cuda
+.build_cuda_common: &build_cuda_common
   before_script:
+    - apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+    - apt-get update
+    - $INSTALL_TZDATA
+    - $INSTALL_TZDATA1
+    - $INSTALL_TZDATA2
+    - apt-get install -y dirmngr gnupg2
+    - echo "deb $INSTALL_ROS main" > /etc/apt/sources.list.d/ros-latest.list
+    - apt-get install --no-install-recommends -y python-rosdep python-rosinstall python-vcstools
+    - export LANG=C.UTF-8
+    - export LC_ALL=C.UTF-8
+    - rosdep init
+    - rosdep update
+    - apt-get update
+    - $INSTALL_ROS2
+    - $INSTALL_ROS3
+
     - mkdir -p src_tmp/$CI_PROJECT_NAME && mv `find -maxdepth 1 -not -name . -not -name src_tmp` src_tmp/$CI_PROJECT_NAME && mv src_tmp/ src/
-    - sudo apt-get update
-    - sudo apt-get install -y libarmadillo-dev libglew-dev libssh2-1-dev python-flask python-requests wget
-    - sudo apt-get install -y python3-pip python3-setuptools python3-colcon-common-extensions python3-vcstool
+    - apt-get install -y libarmadillo-dev libglew-dev libssh2-1-dev python-flask python-requests wget
+
+    - apt-get install -y python3-pip python3-setuptools python3-colcon-common-extensions
     # Update setuptools from PyPI because the version Ubuntu ships with is too old
     - pip3 install -U setuptools
     - rosdep update
@@ -75,72 +88,47 @@ variables:
     - merge_requests
     - master
 
-.build_cross_vars: &build_cross_vars
-    AUTOWARE_TARGET_ARCH: aarch64
-    AUTOWARE_TOOLCHAIN_FILE_PATH: $CI_PROJECT_DIR/cross_toolchain.cmake
-    AUTOWARE_SYSROOT: /sysroot/${AUTOWARE_CROSS_TARGET_PLATFORM}
-
-.build_cross: &build_cross_common
-  script:
-    - mkdir -p src_tmp/$CI_PROJECT_NAME && mv `find -maxdepth 1 -not -name . -not -name src_tmp` src_tmp/$CI_PROJECT_NAME && mv src_tmp/ src/
-    - apt update -qq && apt install -y python3-vcstool git wget
-    - wget https://gitlab.com/autowarefoundation/autoware.ai/autoware/raw/master/ros/cross_toolchain.cmake
-    - source ${AUTOWARE_SYSROOT}/opt/ros/${ROS_DISTRO}/setup.bash
-    - colcon build
-        --merge-install
-        --cmake-args
-        -DCMAKE_TOOLCHAIN_FILE=${AUTOWARE_TOOLCHAIN_FILE_PATH}
-        -DCMAKE_SYSTEM_PROCESSOR=${AUTOWARE_TARGET_ARCH}
-        -DCMAKE_PREFIX_PATH="${CI_PROJECT_DIR}/install;${AUTOWARE_SYSROOT}/opt/ros/${ROS_DISTRO}"
-        -DCMAKE_FIND_ROOT_PATH=${CI_PROJECT_DIR}/install
-  only:
-    - merge_requests
-    - master
-
 build_kinetic:
   stage: build
-  image: autoware/autoware:bleedingedge-kinetic-base
+  image: ros:kinetic-perception
   variables:
     INSTALL_LCOV: git clone https://github.com/linux-test-project/lcov.git
     INSTALL_LCOV2: cd lcov
     INSTALL_LCOV3: git checkout v1.13
-    INSTALL_LCOV4: sudo make install
+    INSTALL_LCOV4: make install
     INSTALL_LCOV5: cd ..
     INSTALL_LCOV6: rm -r lcov
   <<: *build_common
 
 build_melodic:
   stage: build
-  image: autoware/autoware:bleedingedge-melodic-base
+  image: ros:melodic-perception
   variables:
-    INSTALL_LCOV: sudo apt install -y lcov
+    INSTALL_LCOV: apt install -y lcov
   <<: *build_common
 
 build_kinetic_cuda:
   stage: build
-  image: autoware/autoware:bleedingedge-kinetic-base-cuda
-  <<: *build_cuda
+  image: nvidia/cuda:9.0-runtime-ubuntu16.04
+  variables:
+    INSTALL_ROS: http://packages.ros.org/ros/ubuntu xenial
+    INSTALL_ROS2: apt-get install -y ros-kinetic-ros-core
+    INSTALL_ROS3: apt-get install -y ros-kinetic-perception
+    ROS_DISTRO: kinetic
+  <<: *build_cuda_common
 
 build_melodic_cuda:
   stage: build
-  image: autoware/autoware:bleedingedge-melodic-base-cuda
-  <<: *build_cuda
-
-build_kinetic_cross:
-  stage: build
-  image: autoware/build:${AUTOWARE_CROSS_TARGET_PLATFORM}-kinetic-bleedingedge
+  image: nvidia/cuda:10.0-runtime-ubuntu18.04
   variables:
-    ROS_DISTRO: kinetic
-    <<: *build_cross_vars
-  <<: *build_cross_common
-
-build_melodic_cross:
-  stage: build
-  image: autoware/build:${AUTOWARE_CROSS_TARGET_PLATFORM}-melodic-bleedingedge
-  variables:
+    INSTALL_TZDATA: echo 'Etc/UTC' > /etc/timezone
+    INSTALL_TZDATA1: ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime
+    INSTALL_TZDATA2: apt-get install -q -y tzdata
+    INSTALL_ROS: http://packages.ros.org/ros/ubuntu bionic
+    INSTALL_ROS2: apt-get install -y ros-melodic-ros-core
+    INSTALL_ROS3: apt-get install -y ros-melodic-perception
     ROS_DISTRO: melodic
-    <<: *build_cross_vars
-  <<: *build_cross_common
+  <<: *build_cuda_common
 
 pages:
   stage: deploy

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ********************
- *  v1.0: drwnz (david.wong@tier4.jp)
+ *  v0.1.0: drwnz (david.wong@tier4.jp)
  *
  * tensorflow_ros.cpp
  *
