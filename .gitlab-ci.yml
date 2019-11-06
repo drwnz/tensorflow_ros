@@ -6,7 +6,6 @@ stages:
   before_script:
     - mkdir -p src_tmp/$CI_PROJECT_NAME && mv `find -maxdepth 1 -not -name . -not -name src_tmp` src_tmp/$CI_PROJECT_NAME && mv src_tmp/ src/
     - apt-get update
-    - apt-get install -y libarmadillo-dev libglew-dev libssh2-1-dev python-flask python-requests wget
     - apt-get install -y python3-pip python3-setuptools python3-colcon-common-extensions
     # Update setuptools from PyPI because the version Ubuntu ships with is too old
     - pip3 install -U setuptools
@@ -47,31 +46,33 @@ stages:
   only:
     - merge_requests
     - master
+    - gitlab-ci-testing
 
 .build_cuda_common: &build_cuda_common
   before_script:
-    - apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
     - apt-get update
     - $INSTALL_TZDATA
     - $INSTALL_TZDATA1
     - $INSTALL_TZDATA2
-    - apt-get install -y dirmngr gnupg2
+    # - apt-get install -y dirmngr gnupg2
     - echo "deb $INSTALL_ROS main" > /etc/apt/sources.list.d/ros-latest.list
-    - apt-get install --no-install-recommends -y python-rosdep python-rosinstall python-vcstools
-    - export LANG=C.UTF-8
-    - export LC_ALL=C.UTF-8
-    - rosdep init
-    - rosdep update
+    - apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
     - apt-get update
-    - $INSTALL_ROS2
+    # - apt-get install --no-install-recommends -y python-rosdep python-rosinstall python-vcstools
+    # - export LANG=C.UTF-8
+    # - export LC_ALL=C.UTF-8
+    # - $INSTALL_ROS2
     - $INSTALL_ROS3
+    # - rosdep init
+    # - rosdep update
 
     - mkdir -p src_tmp/$CI_PROJECT_NAME && mv `find -maxdepth 1 -not -name . -not -name src_tmp` src_tmp/$CI_PROJECT_NAME && mv src_tmp/ src/
-    - apt-get install -y libarmadillo-dev libglew-dev libssh2-1-dev python-flask python-requests wget
+    # - apt-get install -y libarmadillo-dev libglew-dev libssh2-1-dev python-flask python-requests wget
 
     - apt-get install -y python3-pip python3-setuptools python3-colcon-common-extensions
     # Update setuptools from PyPI because the version Ubuntu ships with is too old
     - pip3 install -U setuptools
+    - rosdep init
     - rosdep update
     - rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
   script:
@@ -87,6 +88,7 @@ stages:
   only:
     - merge_requests
     - master
+    - gitlab-ci-testing
 
 build_kinetic:
   stage: build
@@ -146,3 +148,4 @@ pages:
       - public
   only:
     - master
+    - gitlab-ci-testing
