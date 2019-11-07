@@ -54,21 +54,11 @@ stages:
     - $INSTALL_TZDATA
     - $INSTALL_TZDATA1
     - $INSTALL_TZDATA2
-    # - apt-get install -y dirmngr gnupg2
-    - echo "deb $INSTALL_ROS main" > /etc/apt/sources.list.d/ros-latest.list
+    - echo "deb http://packages.ros.org/ros/ubuntu $UBUNTU_DISTRO main" > /etc/apt/sources.list.d/ros-latest.list
     - apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
     - apt-get update
-    # - apt-get install --no-install-recommends -y python-rosdep python-rosinstall python-vcstools
-    # - export LANG=C.UTF-8
-    # - export LC_ALL=C.UTF-8
-    # - $INSTALL_ROS2
-    - $INSTALL_ROS3
-    # - rosdep init
-    # - rosdep update
-
+    - $INSTALL_ROS
     - mkdir -p src_tmp/$CI_PROJECT_NAME && mv `find -maxdepth 1 -not -name . -not -name src_tmp` src_tmp/$CI_PROJECT_NAME && mv src_tmp/ src/
-    # - apt-get install -y libarmadillo-dev libglew-dev libssh2-1-dev python-flask python-requests wget
-
     - apt-get install -y python3-pip python3-setuptools python3-colcon-common-extensions
     # Update setuptools from PyPI because the version Ubuntu ships with is too old
     - pip3 install -U setuptools
@@ -113,10 +103,9 @@ build_kinetic_cuda:
   stage: build
   image: nvidia/cuda:9.0-runtime-ubuntu16.04
   variables:
-    INSTALL_ROS: http://packages.ros.org/ros/ubuntu xenial
-    INSTALL_ROS2: apt-get install -y ros-kinetic-ros-core
-    INSTALL_ROS3: apt-get install -y ros-kinetic-perception
+    UBUNTU_DISTRO: xenial
     ROS_DISTRO: kinetic
+    INSTALL_ROS: apt-get install -y ros-kinetic-perception
   <<: *build_cuda_common
 
 build_melodic_cuda:
@@ -126,10 +115,9 @@ build_melodic_cuda:
     INSTALL_TZDATA: echo 'Etc/UTC' > /etc/timezone
     INSTALL_TZDATA1: ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime
     INSTALL_TZDATA2: apt-get install -q -y tzdata
-    INSTALL_ROS: http://packages.ros.org/ros/ubuntu bionic
-    INSTALL_ROS2: apt-get install -y ros-melodic-ros-core
-    INSTALL_ROS3: apt-get install -y ros-melodic-perception
+    UBUNTU_DISTRO: bionic
     ROS_DISTRO: melodic
+    INSTALL_ROS: apt-get install -y ros-melodic-perception
   <<: *build_cuda_common
 
 pages:
