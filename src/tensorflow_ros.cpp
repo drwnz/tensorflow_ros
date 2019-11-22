@@ -36,8 +36,15 @@ TensorFlowSession::TensorFlowSession(const char* graph_filename, const char* inp
   input_tensors_.clear();
   output_tensors_ = { nullptr };
 
+  TF_Buffer* options_buffer = TF_CreateConfig(0, 1, sysconf(_SC_NPROCESSORS_ONLN));
+
   TF_ImportGraphDefOptions* graph_options = TF_NewImportGraphDefOptions();
   TF_SessionOptions* session_options = TF_NewSessionOptions();
+  // uint8_t config[16] ={0x32, 0xe, 0x9, 0x1d, 0x5a,
+  //                   0x64, 0x3b, 0xdf, 0x4f, 0xd5,
+  //                   0x3f, 0x20, 0x1, 0x2a, 0x1, 0x30};
+  // TF_SetConfig(session_options, (void*)config, 16, status_);
+  TF_SetConfig(session_options, options_buffer->data, options_buffer->length, status_);
 
   TF_Buffer* buffer = ReadBufferFromFile(graph_filename);
   if (buffer == nullptr)

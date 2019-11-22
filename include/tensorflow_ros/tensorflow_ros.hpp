@@ -26,6 +26,7 @@
 #define __APP_NAME__ "tensorflow_ros"
 
 #include <tensorflow/c/c_api.h>
+#include <tensorflow/c/c_api_experimental.h>
 #include <cstdio>
 #include <type_traits>
 #include <cstddef>
