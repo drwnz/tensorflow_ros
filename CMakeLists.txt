@@ -42,6 +42,7 @@ if(TENSORFLOW_FOUND AND ${TENSORFLOW_CPU})
 endif()
 
 if(TENSORFLOW_FOUND)
+  message(STATUS "TensorFlow Llibrary: " ${TENSORFLOW_LIBRARIES})
   include_directories(tensorflow_ros
     include
     ${TENSORFLOW_INCLUDE_DIRS}
@@ -71,16 +72,15 @@ if(TENSORFLOW_FOUND)
   ### Unit Tests ###
   if(CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
-    add_rostest_gtest(test_tensorflow_ros
-    test/test_tensorflow_ros.test
-    test/src/test_tensorflow_ros.cpp
-    )
+      add_rostest_gtest(test_tensorflow_ros
+      test/test_tensorflow_ros.test
+      test/src/test_tensorflow_ros.cpp
+      )
     target_link_libraries(test_tensorflow_ros
-    ${TENSORFLOW_LIBRARIES}
-    ${catkin_LIBRARIES}
-    tensorflow_ros
-    )
+      ${catkin_LIBRARIES}
+      tensorflow_ros
+      )
   endif()
-else ()
+else()
   message(FATAL_ERROR "'TensorFlow' is not installed. The library 'tensorflow_ros' will not be built.")
-endif ()
+endif()
