@@ -12,6 +12,11 @@ include(cmake/tensorflow.cmake)
 
 if(TENSORFLOW_FOUND AND CUDA_FOUND AND CUDNN_FOUND)
   if((${CUDA_VERSION} STREQUAL "9.0") OR (${CUDA_VERSION} STREQUAL "10.0"))
+    if(${CUDA_VERSION} STREQUAL "9.0")
+      set(TENSORFLOW_NEW_EXPERIMENTAL_API 0)
+    else()
+      set(TENSORFLOW_NEW_EXPERIMENTAL_API 1)
+    endif()
     message(STATUS "-- USING TENSORFLOW IN GPU MODE --")
     message(STATUS "CUDA Version: " ${CUDA_VERSION})
     message(STATUS "CUDA Library: " ${CUDA_CUDA_LIBRARY})
@@ -32,6 +37,7 @@ if(TENSORFLOW_FOUND AND CUDA_FOUND AND CUDNN_FOUND)
 endif()
 if(TENSORFLOW_FOUND AND ${TENSORFLOW_CPU})
   message(STATUS "-- USING TENSORFLOW IN CPU MODE --")
+  set(TENSORFLOW_NEW_EXPERIMENTAL_API 1)
   catkin_package(
     INCLUDE_DIRS include
     LIBRARIES tensorflow_ros
@@ -42,7 +48,8 @@ if(TENSORFLOW_FOUND AND ${TENSORFLOW_CPU})
 endif()
 
 if(TENSORFLOW_FOUND)
-  message(STATUS "TensorFlow Llibrary: " ${TENSORFLOW_LIBRARIES})
+  message(STATUS "TensorFlow Library: " ${TENSORFLOW_LIBRARY})
+  add_definitions(-DTENSORFLOW_NEW_EXPERIMENTAL_API=${TENSORFLOW_NEW_EXPERIMENTAL_API})
   include_directories(tensorflow_ros
     include
     ${TENSORFLOW_INCLUDE_DIRS}
