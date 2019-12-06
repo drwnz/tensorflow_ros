@@ -48,7 +48,7 @@ if(TENSORFLOW_FOUND AND ${TENSORFLOW_CPU})
 endif()
 
 if(TENSORFLOW_FOUND)
-  message(STATUS "TensorFlow Library: " ${TENSORFLOW_LIBRARY})
+  message(STATUS "TensorFlow Library: " ${TENSORFLOW_LIBRARIES})
   add_definitions(-DTENSORFLOW_NEW_EXPERIMENTAL_API=${TENSORFLOW_NEW_EXPERIMENTAL_API})
   include_directories(tensorflow_ros
     include
